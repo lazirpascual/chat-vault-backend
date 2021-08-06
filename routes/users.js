@@ -1,6 +1,12 @@
 const User = require("../models/User");
 const usersRouter = require("express").Router();
 
+// get all users
+usersRouter.get("/", async (req, res) => {
+  const users = await User.find({});
+  res.json(users);
+});
+
 // update user
 usersRouter.put("/:id", async (req, res) => {
   if (req.body.userId === req.params.id || req.body.isAdmin) {
@@ -31,7 +37,7 @@ usersRouter.delete("/:id", async (req, res) => {
   }
 });
 
-// get a user
+// get individual user
 usersRouter.get("/:id", async (req, res) => {
   const user = await User.findById(req.params.id);
   const { password, updatedAt, ...other } = user._doc;

@@ -45,7 +45,13 @@ postsRouter.put("/:id/like", async (req, res) => {
   }
 });
 
-// get a post
+// get all posts
+postsRouter.get("/", async (req, res) => {
+  const posts = await Post.find({});
+  res.json(posts);
+});
+
+// get individual post
 postsRouter.get("/:id", async (req, res) => {
   const post = await Post.findById(req.params.id);
   res.status(200).json(post);
