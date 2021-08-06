@@ -1,8 +1,27 @@
+const User = require("../models/User");
+
 const usersRouter = require("express").Router();
 
 // update user
-usersRouter.get("/", (req, res) => {
-  res.send("hey its user route");
+usersRouter.put("/:id", async (req, res) => {
+  if (req.body.userId === req.params.id || req.user.isAdmin) {
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      req.body.password = await bcrypt.hash(req.body.password, salt);
+    }
+    const user = await User.findByIdAndUpdate(req.params.id, {
+      $set: req.body,
+    });
+    res.status(200).json("Account has been updated");
+  } else {
+    return res.status(403).json("Only a user can update their account");
+  }
 });
+
+// delete user
+
+// get a user
+// follow a user
+// unfollow a user
 
 module.exports = usersRouter;
