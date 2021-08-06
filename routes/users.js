@@ -1,3 +1,4 @@
+const { router, response } = require("../app");
 const User = require("../models/User");
 
 const usersRouter = require("express").Router();
@@ -9,7 +10,7 @@ usersRouter.put("/:id", async (req, res) => {
       const salt = await bcrypt.genSalt(10);
       req.body.password = await bcrypt.hash(req.body.password, salt);
     }
-    const user = await User.findByIdAndUpdate(req.params.id, {
+    await User.findByIdAndUpdate(req.params.id, {
       $set: req.body,
     });
     res.status(200).json("Account has been updated");
@@ -33,6 +34,16 @@ usersRouter.delete("/:id", async (req, res) => {
 });
 
 // get a user
+usersRouter.get("/:id", async (req, res) => {
+  const user = await User.findById(req.params.id);
+  const { password, updatedAt, ...other } = user._doc;
+
+  if (user) {
+    res.status(200).json(other);
+  } else {
+    response.status(404).end();
+  }
+});
 
 // follow a user
 
