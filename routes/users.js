@@ -1,6 +1,4 @@
-const { router, response } = require("../app");
 const User = require("../models/User");
-
 const usersRouter = require("express").Router();
 
 // update user
@@ -50,7 +48,7 @@ usersRouter.put("/:id/follow", async (req, res) => {
   if (req.body.userId !== req.params.id) {
     const user = await User.findById(req.params.id); // user we want to follow
     const currentUser = await User.findById(req.body.userId); // current user making the follow request
-    // if current user is not following this user, update the following/followings arrays
+    // if current user is not following this user, follow the user
     if (!user.followers.includes(req.body.userId)) {
       await user.updateOne({ $push: { followers: req.body.userId } });
       await currentUser.updateOne({ $push: { followings: req.params.id } });
@@ -64,5 +62,21 @@ usersRouter.put("/:id/follow", async (req, res) => {
 });
 
 // unfollow a user
+usersRouter.put("/:id/unfollow", async (req, res) => {
+  if (req.body.userId !== req.params.id) {
+    const user = await User.findById(req.params.id); // user we want to unfollow
+    const currentUser = await User.findById(req.body.userId); // current user making the unfollow request
+    // if current user is following this user, unfollow the user
+    if (user.followers.includes(req.body.userId)) {
+      await user.updateOne({ $pull: { followers: req.body.userId } });
+      await currentUser.updateOne({ $pull: { followings: req.params.id } });
+      res.status(200).json("User has been unfollowed.");
+    } else {
+      res.status(403).json("You are not following this user.");
+    }
+  } else {
+    return res.status(403).json("You cannot unfollow yourself.");
+  }
+});
 
 module.exports = usersRouter;
