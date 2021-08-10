@@ -59,7 +59,7 @@ postsRouter.get("/:id", async (req, res) => {
 
 // get timeline posts
 postsRouter.get("/timeline/:userId", async (req, res) => {
-  // get all posts including followed users
+  // get all posts including posts from followed users
   const currentUser = await User.findById(req.params.userId);
   const userPosts = await Post.find({ userId: currentUser._id });
   const friendPosts = await Promise.all(
@@ -68,6 +68,13 @@ postsRouter.get("/timeline/:userId", async (req, res) => {
     })
   );
   res.status(200).json(userPosts.concat(...friendPosts));
+});
+
+// get all of a user's posts
+postsRouter.get("/profile/:username", async (req, res) => {
+  const user = await User.findOne({ username: req.params.username });
+  const posts = await Post.find({ userId: user._id });
+  res.status(200).json(posts);
 });
 
 module.exports = postsRouter;
