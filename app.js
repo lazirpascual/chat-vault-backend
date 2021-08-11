@@ -11,6 +11,8 @@ const mongoose = require("mongoose");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const postsRouter = require("./routes/posts");
+const upload = require("./utils/uploadFile");
+const path = require("path");
 
 logger.info("connecting to", config.MONGODB_URI);
 
@@ -28,6 +30,9 @@ mongoose
     logger.error("error connecting to MongoDB:", error.message);
   });
 
+// by going to images path, go to directory images directory instead making a get request
+app.use("/images", express.static(path.join(__dirname, "public/images")));
+
 // middleware
 app.use(cors());
 app.use(express.static("build"));
@@ -35,6 +40,15 @@ app.use(express.json());
 app.use(helmet());
 app.use(morgan("tiny"));
 app.use(middleware.tokenExtractor);
+
+// upload file
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  try {
+    return res.status(200).json("File uploded successfully");
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 // routes
 app.use("/api/users", usersRouter);
