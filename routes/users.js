@@ -1,3 +1,4 @@
+const { Router } = require("express");
 const User = require("../models/User");
 const usersRouter = require("express").Router();
 
@@ -46,6 +47,24 @@ usersRouter.get("/", async (req, res) => {
   } else {
     response.status(404).end();
   }
+});
+
+// get friends
+usersRouter.get("/friends/:userId", async (req, res) => {
+  const user = await User.findById(req.params.userId);
+  // store all of friends into array
+  const friends = await Promise.all(
+    user.followings.map((friendId) => {
+      return User.findById(friendId);
+    })
+  );
+  // store friends into array with only the required properties
+  let friendList = [];
+  friends.map((friend) => {
+    const { _id, username, profilePicture } = friend;
+    friendList.push({ _id, username, profilePicture });
+  });
+  res.status(200).json(friendList);
 });
 
 // follow a user
