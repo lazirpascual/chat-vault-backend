@@ -12,6 +12,8 @@ const mongoose = require("mongoose");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const postsRouter = require("./routes/posts");
+const conversationRouter = require("./routes/conversation");
+const messageRouter = require("./routes/message");
 const path = require("path");
 
 logger.info("connecting to", config.MONGODB_URI);
@@ -54,6 +56,8 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
+app.use("/api/conversations", conversationRouter);
+app.use("/api/messages", messageRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
