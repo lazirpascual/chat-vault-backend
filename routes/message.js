@@ -1,7 +1,7 @@
 const messageRouter = require("express").Router();
 const Message = require("../models/Message");
 
-// add message
+// create message
 messageRouter.post("/", async (req, res) => {
   const newMessage = new Message(req.body);
 

@@ -20,4 +20,12 @@ conversationRouter.get("/:userId", async (req, res) => {
   res.status(200).json(conversation);
 });
 
+// get conversion of two users
+conversationRouter.get("/find/:firstUserId/:secondUserId", async (req, res) => {
+  const conversation = await Conversation.findOne({
+    members: { $all: [req.params.firstUserId, req.params.secondUserId] },
+  });
+  res.status(200).json(conversation);
+});
+
 module.exports = conversationRouter;
