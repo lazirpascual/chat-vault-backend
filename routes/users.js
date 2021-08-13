@@ -1,36 +1,7 @@
 const { Router } = require("express");
 const User = require("../models/User");
 const usersRouter = require("express").Router();
-
-// update user
-usersRouter.put("/:id", async (req, res) => {
-  if (req.body.userId === req.params.id || req.body.isAdmin) {
-    if (req.body.password) {
-      const salt = await bcrypt.genSalt(10);
-      req.body.password = await bcrypt.hash(req.body.password, salt);
-    }
-    await User.findByIdAndUpdate(req.params.id, {
-      $set: req.body,
-    });
-    res.status(200).json("Account has been updated");
-  } else {
-    return res
-      .status(403)
-      .json("Only the owner of this account can make an update request");
-  }
-});
-
-// delete user
-usersRouter.delete("/:id", async (req, res) => {
-  if (req.body.userId === req.params.id || req.body.isAdmin) {
-    await User.findByIdAndDelete(req.params.id);
-    res.status(200).json("Account has been deleted!");
-  } else {
-    return res
-      .status(403)
-      .json("Only the owner of this account can make a delete request");
-  }
-});
+const middleware = require("../utils/middleware");
 
 // get individual user
 usersRouter.get("/", async (req, res) => {
@@ -67,8 +38,38 @@ usersRouter.get("/friends/:userId", async (req, res) => {
   res.status(200).json(friendList);
 });
 
+// update user
+usersRouter.put("/:id", middleware.tokenAuth, async (req, res) => {
+  if (req.body.userId === req.params.id || req.body.isAdmin) {
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      req.body.password = await bcrypt.hash(req.body.password, salt);
+    }
+    await User.findByIdAndUpdate(req.params.id, {
+      $set: req.body,
+    });
+    res.status(200).json("Account has been updated");
+  } else {
+    return res
+      .status(403)
+      .json("Only the owner of this account can make an update request");
+  }
+});
+
+// delete user
+usersRouter.delete("/:id", middleware.tokenAuth, async (req, res) => {
+  if (req.body.userId === req.params.id || req.body.isAdmin) {
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).json("Account has been deleted!");
+  } else {
+    return res
+      .status(403)
+      .json("Only the owner of this account can make a delete request");
+  }
+});
+
 // follow a user
-usersRouter.put("/:id/follow", async (req, res) => {
+usersRouter.put("/:id/follow", middleware.tokenAuth, async (req, res) => {
   if (req.body.userId !== req.params.id) {
     const user = await User.findById(req.params.id); // user we want to follow
     const currentUser = await User.findById(req.body.userId); // current user making the follow request
@@ -86,7 +87,7 @@ usersRouter.put("/:id/follow", async (req, res) => {
 });
 
 // unfollow a user
-usersRouter.put("/:id/unfollow", async (req, res) => {
+usersRouter.put("/:id/unfollow", middleware.tokenAuth, async (req, res) => {
   if (req.body.userId !== req.params.id) {
     const user = await User.findById(req.params.id); // user we want to unfollow
     const currentUser = await User.findById(req.body.userId); // current user making the unfollow request

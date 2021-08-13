@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const authRouter = require("express").Router();
 const User = require("../models/User");
@@ -28,7 +29,17 @@ authRouter.post("/login", async (req, res) => {
   const validPassword = await bcrypt.compare(req.body.password, user.password);
   !validPassword && res.status(400).json("Invalid Password.");
 
-  res.status(200).json(user);
+  const userForToken = {
+    username: user.username,
+    id: user._id,
+  };
+
+  // token expires in 60*60 seconds, that is, in one hour
+  const token = jwt.sign(userForToken, process.env.SECRET, {
+    expiresIn: 60 * 60,
+  });
+
+  res.status(200).json({ token, user });
 });
 
 module.exports = authRouter;

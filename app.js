@@ -53,11 +53,11 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 });
 
 // routes
-app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
 app.use("/api/posts", postsRouter);
-app.use("/api/conversations", conversationRouter);
-app.use("/api/messages", messageRouter);
+app.use("/api/conversations", middleware.tokenAuth, conversationRouter);
+app.use("/api/messages", middleware.tokenAuth, messageRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);

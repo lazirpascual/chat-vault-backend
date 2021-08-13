@@ -1,16 +1,17 @@
 const postsRouter = require("express").Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
+const middleware = require("../utils/middleware");
 
 // create a post
-postsRouter.post("/", async (req, res) => {
+postsRouter.post("/", middleware.tokenAuth, async (req, res) => {
   const newPost = new Post(req.body);
   const savedPost = await newPost.save();
   res.status(200).json(savedPost);
 });
 
 // update a post
-postsRouter.put("/:id", async (req, res) => {
+postsRouter.put("/:id", middleware.tokenAuth, async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (post.userId === req.body.userId) {
     await post.updateOne({ $set: req.body });
@@ -21,7 +22,7 @@ postsRouter.put("/:id", async (req, res) => {
 });
 
 // delete a post
-postsRouter.delete("/:id", async (req, res) => {
+postsRouter.delete("/:id", middleware.tokenAuth, async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (post.userId === req.body.userId) {
     await post.deleteOne();
@@ -32,7 +33,7 @@ postsRouter.delete("/:id", async (req, res) => {
 });
 
 // like/dislike a post
-postsRouter.put("/:id/like", async (req, res) => {
+postsRouter.put("/:id/like", middleware.tokenAuth, async (req, res) => {
   const post = await Post.findById(req.params.id);
   // if likes array includes userId, like the post
   if (!post.likes.includes(req.body.userId)) {
