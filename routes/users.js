@@ -1,7 +1,12 @@
-const { Router } = require("express");
 const User = require("../models/User");
 const usersRouter = require("express").Router();
 const middleware = require("../utils/middleware");
+
+// get all users
+usersRouter.get("/", async (req, res) => {
+  const users = await User.find({});
+  res.json(users);
+});
 
 // get individual user
 usersRouter.get("/", async (req, res) => {
