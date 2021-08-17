@@ -22,15 +22,20 @@ postsRouter.put("/:id", middleware.tokenAuth, async (req, res) => {
 });
 
 // delete a post
-postsRouter.delete("/:id", middleware.tokenAuth, async (req, res) => {
-  const post = await Post.findById(req.params.id);
-  if (post.userId === req.body.userId) {
-    await post.deleteOne();
-    res.status(200).json("The post has been deleted.");
-  } else {
-    res.status(403).json("Only the user can delete this post.");
+postsRouter.delete(
+  "/:postId/:userId",
+  middleware.tokenAuth,
+  async (req, res) => {
+    const post = await Post.findById(req.params.postId);
+    console.log(req.body);
+    if (post.userId === req.params.userId) {
+      await post.deleteOne();
+      res.status(200).json("The post has been deleted.");
+    } else {
+      res.status(403).json("Only the user can delete this post.");
+    }
   }
-});
+);
 
 // like/dislike a post
 postsRouter.put("/:id/like", middleware.tokenAuth, async (req, res) => {
