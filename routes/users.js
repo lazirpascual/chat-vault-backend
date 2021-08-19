@@ -46,11 +46,7 @@ usersRouter.get("/friends/:userId", async (req, res) => {
 
 // update user
 usersRouter.put("/:id", middleware.tokenAuth, async (req, res) => {
-  if (req.body.userId === req.params.id || req.body.isAdmin) {
-    if (req.body.password) {
-      const salt = await bcrypt.genSalt(10);
-      req.body.password = await bcrypt.hash(req.body.password, salt);
-    }
+  if (req.body._id === req.params.id || req.body.isAdmin) {
     await User.findByIdAndUpdate(req.params.id, {
       $set: req.body,
     });
