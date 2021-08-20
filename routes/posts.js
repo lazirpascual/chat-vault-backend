@@ -27,7 +27,6 @@ postsRouter.delete(
   middleware.tokenAuth,
   async (req, res) => {
     const post = await Post.findById(req.params.postId);
-    console.log(req.body);
     if (post.userId === req.params.userId) {
       await post.deleteOne();
       res.status(200).json("The post has been deleted.");

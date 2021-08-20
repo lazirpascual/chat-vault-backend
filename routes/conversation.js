@@ -11,6 +11,13 @@ conversationRouter.post("/", async (req, res) => {
   res.status(200).json(savedConversation);
 });
 
+// delete a conversation
+conversationRouter.delete("/:conversationId", async (req, res) => {
+  const conversation = await Conversation.findById(req.params.conversationId);
+  await conversation.deleteOne();
+  res.status(200).json("The conversation has been deleted.");
+});
+
 // get all conversations of a user
 conversationRouter.get("/:userId", async (req, res) => {
   // find all conversations that contains the requested ID
