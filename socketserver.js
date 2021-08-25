@@ -4,7 +4,7 @@ const { addUser, removeUser, getUser } = require("./utils/socketUsers");
 const createSocketIOServer = (server) => {
   const io = require("socket.io")(server, {
     cors: {
-      origins: "*:*",
+      origin: "*",
     },
   });
   let users = [];
